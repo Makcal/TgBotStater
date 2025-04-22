@@ -1,5 +1,6 @@
-#include <tg_stater/bot.hpp>
 #include <tgbot/Bot.h>
+#include <tg_stater/bot.hpp>
+#include <tg_stater/handler/handler.hpp>
 
 #include <variant>
 #include <vector>
@@ -19,6 +20,15 @@ int main() {
 
     TgBot::Bot bot{""};
 
-    Setup<State>::Stater<> stater{};
+    static constexpr const char helpCmd[] = "help";
+    auto help = [](StateA&, const TgBot::Message& m, const TgBot::Api& bot) {
+        bot.sendMessage(m.chat->id, "This is a test bot");
+    };
+
+    // Test for compilation
+    Setup<State>::Stater<
+        Handler<Events::Command{helpCmd}, help>
+    > stater{};
+    // No run since no token provided
     // stater.start(std::move(bot));
 }
