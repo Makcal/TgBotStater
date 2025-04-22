@@ -18,9 +18,8 @@
 #include <chrono>
 #include <concepts>
 #include <exception>
+#include <format>
 #include <iostream>
-#include <ostream>
-#include <print>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
@@ -159,8 +158,8 @@ class StaterBase {
     }
 
     static void logEvent(std::string_view event_type, const StateKey key) {
-        std::println(
-            std::clog, "{}: Trying to handle {} from chat {}", std::chrono::system_clock::now(), event_type, key);
+        std::clog << std::format(
+            "{}: Trying to handle {} from chat {}\n", std::chrono::system_clock::now(), event_type, key);
     }
 
     template <typename Callbacks_>
@@ -254,13 +253,13 @@ class StaterBase {
     void start(TgBot::Bot&& bot) { // NOLINT(*-rvalue-reference-param-not-moved)
         setup(bot);
 
-        std::println(std::clog, "Bot has started.");
+        std::clog << "Bot has started.\n";
         TgBot::TgLongPoll longPoll{bot};
         while (true) {
             try {
                 longPoll.start();
             } catch (const std::exception& e) {
-                std::println(std::clog, "{}", e.what());
+                std::clog << e.what() << '\n';
             }
         }
     }

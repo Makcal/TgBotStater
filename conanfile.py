@@ -15,6 +15,7 @@ class TgBotStaterConan(ConanFile):
     license = "MIT"
 
     url = "https://github.com/Makcal/TgBotStater"
+    homepage = "https://github.com/Makcal/TgBotStater"
     topics = ("telegram", "telegram-bot")
 
     package_type = "header-library"
@@ -28,13 +29,13 @@ class TgBotStaterConan(ConanFile):
         self.requires("brigand/cpp11-1.3.0", options={"with_boost": False})
 
     def validate(self):
-        check_min_cppstd(self, 23)
+        check_min_cppstd(self, 20)
 
     def source(self):
         get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def layout(self):
-        cmake_layout(self)
+        cmake_layout(self, src_folder='src')
 
     def build(self):
         cmake = CMake(self)
