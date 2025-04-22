@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.0)
+cmake_minimum_required(VERSION 3.4.0)
 
 project(TgBotStater CXX)
 set(PROJECT_VERSION "0.1.0")
