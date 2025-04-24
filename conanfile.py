@@ -31,11 +31,12 @@ class TgBotStaterConan(ConanFile):
     def validate(self):
         check_min_cppstd(self, 20)
 
-    def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+    # for ConanCenterIndex
+    # def source(self):
+    #     get(self, **self.conan_data["sources"][self.version], strip_root=True)
 
     def layout(self):
-        cmake_layout(self, src_folder='src')
+        cmake_layout(self, src_folder='.')
 
     def build(self):
         cmake = CMake(self)
