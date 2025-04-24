@@ -62,7 +62,7 @@ class StateProxy {
         return std::as_const(storage).get(key);
     }
 
-    [[nodiscard]] decltype(auto) operator[]() const {
+    [[nodiscard]] decltype(auto) operator()() const {
         return get();
     }
 
