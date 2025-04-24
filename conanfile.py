@@ -10,13 +10,14 @@ required_conan_version = ">=2.0"
 
 class TgBotStaterConan(ConanFile):
     name = "tgbotstater"
+    version = "0.1.1"
     description = "A C++ library for constructing Telegram bots in compile-time!"
     author = "Maxim Fomin fominmaxim3721@gmail.com"
     license = "MIT"
 
     url = "https://github.com/Makcal/TgBotStater"
     homepage = "https://github.com/Makcal/TgBotStater"
-    topics = ("telegram", "telegram-bot")
+    topics = ("telegram", "telegram-bot", "header-only")
 
     package_type = "header-library"
     settings = "os", "arch", "compiler", "build_type"
