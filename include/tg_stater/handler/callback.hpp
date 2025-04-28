@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_handler_callback
-#define INCLUDE_tg_bot_stater_handler_callback
+#ifndef INCLUDE_tgbotstater_handler_callback
+#define INCLUDE_tgbotstater_handler_callback
 
 #include "tg_stater/handler/event.hpp"
 #include "tg_stater/handler/type.hpp"
@@ -180,4 +180,4 @@ class Callback {
 
 } // namespace tg_stater
 
-#endif // INCLUDE_tg_bot_stater_handler_callback
+#endif // INCLUDE_tgbotstater_handler_callback

@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_meta
-#define INCLUDE_tg_bot_stater_meta
+#ifndef INCLUDE_tgbotstater_meta
+#define INCLUDE_tgbotstater_meta
 
 #include <brigand/algorithms/fold.hpp>
 #include <brigand/algorithms/sort.hpp>
@@ -218,4 +218,4 @@ template <typename T>
 using TupleToProxy = detail::TupleToProxyImpl<T>::type;
 
 } // namespace tg_stater::meta
-#endif // INCLUDE_tg_bot_stater_meta
+#endif // INCLUDE_tgbotstater_meta

@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_state
-#define INCLUDE_tg_bot_stater_state
+#ifndef INCLUDE_tgbotstater_state
+#define INCLUDE_tgbotstater_state
 
 #include "tg_stater/meta.hpp"
 
@@ -43,4 +43,4 @@ concept OptionalStateOption = StateOption<T, StateT> || IsNulloptStateOption<T>;
 
 } // namespace tg_stater
 
-#endif // !INCLUDE_tg_bot_stater_state
+#endif // !INCLUDE_tgbotstater_state

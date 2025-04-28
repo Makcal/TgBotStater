@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_handler_type
-#define INCLUDE_tg_bot_stater_handler_type
+#ifndef INCLUDE_tgbotstater_handler_type
+#define INCLUDE_tgbotstater_handler_type
 
 #include "tg_stater/meta.hpp"
 
@@ -31,4 +31,4 @@ concept HandlerType =
 
 } // namespace tg_stater
 
-#endif // INCLUDE_tg_bot_stater_handler_type
+#endif // INCLUDE_tgbotstater_handler_type

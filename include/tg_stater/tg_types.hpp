@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_chat_id_type
-#define INCLUDE_tg_bot_stater_chat_id_type
+#ifndef INCLUDE_tgbotstater_chat_id_type
+#define INCLUDE_tgbotstater_chat_id_type
 
 #include <tgbot/types/Chat.h>
 #include <tgbot/types/Message.h>

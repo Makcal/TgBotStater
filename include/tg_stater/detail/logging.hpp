@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_detail_logging
-#define INCLUDE_tg_bot_stater_detail_logging
+#ifndef INCLUDE_tgbotstater_detail_logging
+#define INCLUDE_tgbotstater_detail_logging
 
 #include <fmt/base.h>
 
@@ -30,4 +30,4 @@ void log(fmt::format_string<Args...> format, Args&&... args) {
 
 } // namespace tg_stater::detail::logging
 
-#endif // INCLUDE_tg_bot_stater_detail_logging
+#endif // INCLUDE_tgbotstater_detail_logging

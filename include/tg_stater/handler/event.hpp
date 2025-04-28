@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_handler_event
-#define INCLUDE_tg_bot_stater_handler_event
+#ifndef INCLUDE_tgbotstater_handler_event
+#define INCLUDE_tgbotstater_handler_event
 
 #include "tg_stater/meta.hpp"
 #include "tg_stater/state_storage/common.hpp"
@@ -183,4 +183,4 @@ concept Event = meta::one_of<T,
 
 } // namespace tg_stater
 
-#endif // INCLUDE_tg_bot_stater_handler_event
+#endif // INCLUDE_tgbotstater_handler_event

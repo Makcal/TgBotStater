@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_state_storage_common
-#define INCLUDE_tg_bot_stater_state_storage_common
+#ifndef INCLUDE_tgbotstater_state_storage_common
+#define INCLUDE_tgbotstater_state_storage_common
 
 #include "tg_stater/detail/logging.hpp"
 #include "tg_stater/state.hpp"
@@ -133,4 +133,4 @@ struct fmt::formatter<tg_stater::StateKey> : formatter<string_view> {
 };
 #endif
 
-#endif // INCLUDE_tg_bot_stater_state_storage_common
+#endif // INCLUDE_tgbotstater_state_storage_common

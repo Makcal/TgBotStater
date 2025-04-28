@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_state_storage_memory
-#define INCLUDE_tg_bot_stater_state_storage_memory
+#ifndef INCLUDE_tgbotstater_state_storage_memory
+#define INCLUDE_tgbotstater_state_storage_memory
 
 #include "tg_stater/state.hpp"
 #include "tg_stater/state_storage/common.hpp"
@@ -36,4 +36,4 @@ class MemoryStateStorage {
 };
 } // namespace tg_stater
 
-#endif // INCLUDE_tg_bot_stater_state_storage_memory
+#endif // INCLUDE_tgbotstater_state_storage_memory

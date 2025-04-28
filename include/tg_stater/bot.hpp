@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_bot
-#define INCLUDE_tg_bot_stater_bot
+#ifndef INCLUDE_tgbotstater_bot
+#define INCLUDE_tgbotstater_bot
 
 #include "tg_stater/dependencies.hpp"
 #include "tg_stater/detail/logging.hpp"
@@ -287,4 +287,4 @@ template <typename StateT, typename... Handlers>
 using DefaultStater = Setup<StateT>::template Stater<Handlers...>;
 
 } // namespace tg_stater
-#endif // INCLUDE_tg_bot_stater_bot
+#endif // INCLUDE_tgbotstater_bot

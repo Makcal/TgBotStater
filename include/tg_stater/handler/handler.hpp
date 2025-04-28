@@ -1,5 +1,5 @@
-#ifndef INCLUDE_tg_bot_stater_handler_handler
-#define INCLUDE_tg_bot_stater_handler_handler
+#ifndef INCLUDE_tgbotstater_handler_handler
+#define INCLUDE_tgbotstater_handler_handler
 
 #include "tg_stater/handler/event.hpp"
 #include "tg_stater/handler/type.hpp"
@@ -17,4 +17,4 @@ struct Handler {
 
 } // namespace tg_stater
 
-#endif // INCLUDE_tg_bot_stater_handler_handler
+#endif // INCLUDE_tgbotstater_handler_handler
