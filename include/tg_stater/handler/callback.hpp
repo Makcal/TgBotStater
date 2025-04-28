@@ -7,7 +7,6 @@
 #include "tg_stater/state.hpp"
 #include "tg_stater/state_storage/common.hpp"
 
-#include <functional>
 #include <tuple>
 #include <type_traits>
 
@@ -37,12 +36,6 @@ struct CallbackHelper<StateT, StateOptionT, HandlerType, StateStorageProxyT, std
     static constexpr bool takesState = decltype(HandlerType)::takesState;
     static_assert(!(takesState && concepts::IsNulloptStateOption<StateOptionT>),
                   "If the handler must take a state, the state option must be specified.");
-
-    // using FuncT = std::conditional_t<
-    //     takesState,
-    //     std::function<void(
-    //         StateOptionT&, const EventArgs&..., const TgBot::Api&, const StateStorageProxyT&, const Dependencies&)>,
-    //     std::function<void(const EventArgs&..., const TgBot::Api&, const StateStorageProxyT&, const Dependencies&)>>;
 
     template <typename F, bool takeState, typename... Args>
     static constexpr bool invocableWithExtra =
@@ -92,7 +85,7 @@ class Callback {
         // Inspired by the approach of "userver".
         // https://github.com/userver-framework/userver/blob/develop/libraries/easy/include/userver/easy.hpp
         // NOLINTBEGIN(*-magic-numbers)
-        static constexpr unsigned matches =
+        constexpr unsigned matches =
             (Helper::template invocableWithExtra<FT, false, ApiRef, SProxyRef, DepRef> << 0) |
             (Helper::template invocableWithExtra<FT, false, SProxyRef, DepRef> << 1) |
             (Helper::template invocableWithExtra<FT, false, ApiRef, DepRef> << 2) |
