@@ -1,12 +1,18 @@
 #ifndef INCLUDE_tg_bot_stater_state_storage_common
 #define INCLUDE_tg_bot_stater_state_storage_common
 
-#include "tg_stater/tg_types.hpp"
+#include "tg_stater/detail/logging.hpp"
 #include "tg_stater/state.hpp"
+#include "tg_stater/tg_types.hpp"
+
+#ifdef USE_STD_FORMAT
+#include <format>
+#else
+#include <fmt/format.h>
+#endif // USE_STD_FORMAT
 
 #include <concepts>
 #include <cstddef>
-#include <format>
 #include <functional>
 #include <optional>
 #include <sstream>
@@ -81,7 +87,7 @@ class StateProxy {
 
 } // namespace tg_stater
 
-template<>
+template <>
 struct std::hash<tg_stater::StateKey> {
     std::size_t operator()(const tg_stater::StateKey& key) const {
         std::size_t h1 = hash<decltype(key.chatId)>{}(key.chatId);
@@ -90,20 +96,19 @@ struct std::hash<tg_stater::StateKey> {
     }
 };
 
-template<>
+#ifdef USE_STD_FORMAT
+template <>
 struct std::formatter<tg_stater::StateKey> {
-    template<class ParseContext>
-    constexpr ParseContext::iterator parse(ParseContext& ctx)
-    {
+    template <class ParseContext>
+    constexpr ParseContext::iterator parse(ParseContext& ctx) {
         auto it = ctx.begin();
         if (it != ctx.end() && *it != '}')
             throw std::format_error("Only empty format args are allowed for StateKey.");
         return it;
     }
 
-    template<class FmtContext>
-    FmtContext::iterator format(const tg_stater::StateKey& key, FmtContext& ctx) const
-    {
+    template <class FmtContext>
+    FmtContext::iterator format(const tg_stater::StateKey& key, FmtContext& ctx) const {
         std::ostringstream out;
         out << "{chatId=" << key.chatId;
         if (key.threadId) {
@@ -113,5 +118,19 @@ struct std::formatter<tg_stater::StateKey> {
         return std::ranges::copy(std::move(out).str(), ctx.out()).out;
     }
 };
+#else
+template <>
+struct fmt::formatter<tg_stater::StateKey> : formatter<string_view> {
+    format_context::iterator format(tg_stater::StateKey key, format_context& ctx) const {
+        std::ostringstream out;
+        out << "{chatId=" << key.chatId;
+        if (key.threadId) {
+            out << ", threadId=" << *key.threadId;
+        }
+        out << '}';
+        return formatter<string_view>::format(std::move(out).str(), ctx);
+    }
+};
+#endif
 
 #endif // INCLUDE_tg_bot_stater_state_storage_common

@@ -2,6 +2,7 @@
 #define INCLUDE_tg_bot_stater_bot
 
 #include "tg_stater/dependencies.hpp"
+#include "tg_stater/detail/logging.hpp"
 #include "tg_stater/handler/callback.hpp"
 #include "tg_stater/handler/event.hpp"
 #include "tg_stater/handler/type.hpp"
@@ -18,8 +19,6 @@
 #include <chrono>
 #include <concepts>
 #include <exception>
-#include <format>
-#include <iostream>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
@@ -158,7 +157,7 @@ class StaterBase {
     }
 
     static void logEvent(std::string_view event_type, const StateKey key) {
-        std::clog << std::format(
+        detail::logging::log(
             "{}: Trying to handle {} from chat {}\n", std::chrono::system_clock::now(), event_type, key);
     }
 
@@ -253,13 +252,13 @@ class StaterBase {
     void start(TgBot::Bot&& bot) { // NOLINT(*-rvalue-reference-param-not-moved)
         setup(bot);
 
-        std::clog << "Bot has started.\n";
+        detail::logging::log("Bot has started.\n");
         TgBot::TgLongPoll longPoll{bot};
         while (true) {
             try {
                 longPoll.start();
             } catch (const std::exception& e) {
-                std::clog << e.what() << '\n';
+                detail::logging::log("{}\n", e.what());
             }
         }
     }

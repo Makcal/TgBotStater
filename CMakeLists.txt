@@ -6,15 +6,16 @@ message(STATUS "${CMAKE_PROJECT_NAME} version: ${PROJECT_VERSION}")
 
 find_package(tgbot REQUIRED)
 find_package(brigand REQUIRED)
+find_package(fmt)
 
 add_library(${PROJECT_NAME} INTERFACE)
 
 target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_20)
 target_include_directories(${PROJECT_NAME} INTERFACE
-    include/
-    ${tgbot_INCLUDE_DIRS}
-    ${brigand_INCLUDE_DIRS})
+    include/)
 target_link_libraries(${PROJECT_NAME} INTERFACE
-    ${tgbot_LIBRARIES})
+    ${tgbot_LIBRARIES}
+    ${bridand_LIBRARIES}
+    ${fmt_LIBRARIES})
 
 install(DIRECTORY include/tg_stater DESTINATION include)
