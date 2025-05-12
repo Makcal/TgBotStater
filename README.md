@@ -19,3 +19,6 @@ Valid handler signatures:
 Everything except for `EventArgs` is optional. 
 Handlers that are not bound to a specific state can't take state parameter.
 For the lists of `EventArgs` see `CallbackArgs` member at [event.hpp](include/tg_stater/handler/event.hpp)
+
+**Note:** it's safe to reference `message.chat->...` objects in message handlers as the chat's id is used for chat/user recognition. 
+Other handler types have similar things, but you'd better check the source code of [event.hpp](include/tg_stater/handler/event.hpp) for that information.
