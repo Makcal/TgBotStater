@@ -46,12 +46,13 @@ struct CallbackHelper<StateT, StateOptionT, HandlerType, StateStorageProxyT, std
 } // namespace detail
 
 /*
- * Valid signatures:
- * from void(const EventArgs&...)
- * up to void([StateOption&, ]const EventArgs&..., const TgBot::Api&, const StateStorageProxy&, const Dependencies&)
+ * Valid handler signatures:
+ *  * from `void(const EventArgs&...)`
+ *  * up to `void(StateOption&, const EventArgs&..., const TgBot::Api&, const StateStorageProxy&, const Dependencies&)`
  *
- * Everything except for EventArgs is optional. "Stateless" handlers can't take state.
- * For the lists of EventArgs see CallbackArgs member at handler/event.hpp
+ * Everything except for `EventArgs` is optional. 
+ * Handlers that are not bound to a specific state can't take state parameter.
+ * For the lists of `EventArgs` see `CallbackArgs` member at [event.hpp](include/tg_stater/handler/event.hpp)
  */
 template <auto F,
           concepts::State StateT,
