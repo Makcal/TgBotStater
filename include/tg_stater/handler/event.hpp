@@ -115,7 +115,7 @@ struct Events {
 
         const char* command;
 
-        explicit Command(const char* command) : command{command} {}
+        explicit constexpr Command(const char* command) : command{command} {}
     };
     struct UnknownCommand {
         using Category = EventCategories::Message;
