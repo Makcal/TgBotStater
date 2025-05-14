@@ -18,7 +18,9 @@
 
 #include <chrono>
 #include <concepts>
+#include <cstdint>
 #include <exception>
+#include <memory>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
@@ -248,12 +250,17 @@ class StaterBase {
                                   DependenciesT dependencies = DependenciesT{})
         : stateStorage{std::move(stateStorage)}, dependencies{std::move(dependencies)} {}
 
+    using UpdatesList = std::vector<std::string>;
+
     // rvalue reference means taking the ownership
-    void start(TgBot::Bot&& bot) { // NOLINT(*-rvalue-reference-param-not-moved)
+    void start(TgBot::Bot&& bot,          // NOLINT(*-rvalue-reference-param-not-moved)
+               std::int32_t limit = 100,  // NOLINT(*-magic-numbers)
+               std::int32_t timeout = 10, // NOLINT(*-magic-numbers)
+               const std::shared_ptr<UpdatesList>& allowedUpdates = std::make_shared<UpdatesList>()) {
         setup(bot);
 
         detail::logging::log("Bot has started.\n");
-        TgBot::TgLongPoll longPoll{bot};
+        TgBot::TgLongPoll longPoll{bot, limit, timeout, allowedUpdates};
         while (true) {
             try {
                 longPoll.start();
