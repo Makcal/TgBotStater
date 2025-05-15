@@ -33,6 +33,15 @@ struct ElementInVariantCheck<T, V, 0> : std::bool_constant<std::is_same_v<T, std
 template <typename T, typename V>
 concept IsPartOfVariantImpl = ElementInVariantCheck<T, V, std::variant_size_v<V> - 1>::value;
 
+template <template <typename...> typename T, template <typename> typename P>
+struct CheckForEachTemplateArgImpl {
+    template <typename V>
+    struct check;
+
+    template <typename... Args>
+    struct check<T<Args...>> : std::bool_constant<(P<Args>::value && ...)> {};
+};
+
 } // namespace detail
 
 template <typename U, template <typename...> typename T>
@@ -40,6 +49,9 @@ concept is_of_template = detail::IsOfTemplateImpl<T>::template check<U>::value;
 
 template <typename T, typename V>
 concept is_part_of_variant = meta::is_of_template<V, std::variant> && detail::IsPartOfVariantImpl<T, V>;
+
+template <typename V, template <typename> typename P>
+concept check_for_each_in_variant = detail::CheckForEachTemplateArgImpl<std::variant, P>::template check<V>::value;
 
 template <template <typename...> typename T, typename... Args1>
 struct curry {

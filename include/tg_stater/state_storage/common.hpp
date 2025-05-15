@@ -2,6 +2,7 @@
 #define INCLUDE_tgbotstater_state_storage_common
 
 #include "tg_stater/detail/logging.hpp"
+#include "tg_stater/meta.hpp"
 #include "tg_stater/state.hpp"
 #include "tg_stater/tg_types.hpp"
 
@@ -16,6 +17,7 @@
 #include <functional>
 #include <optional>
 #include <sstream>
+#include <type_traits>
 #include <utility>
 
 namespace tg_stater {
@@ -33,15 +35,26 @@ struct StateKey {
 
 namespace concepts {
 
+namespace detail {
+
+template <typename StateStorageT, typename T>
+struct CanBePutIntoStorage {
+    static constexpr bool value = requires(StateStorageT& s, const StateKey& key) {
+        { s.put(key, std::declval<const T&>()) } -> std::same_as<typename StateStorageT::StateT&>;
+        { s.put(key, std::declval<T&&>()) } -> std::same_as<typename StateStorageT::StateT&>;
+    };
+};
+
+} // namespace detail
+
 template <typename T, typename StateT>
 concept StateStorage = State<StateT> && requires(T& s, const StateKey& key) {
     typename T::StateT;
     requires std::same_as<typename T::StateT, StateT>;
 
-    { s[key] } -> std::same_as<StateT*>; // pointer here represents a non-const nullable reference (optional<StateT&>)
+    { std::as_const(s)[key] } -> std::same_as<StateT*>; // pointer here represents a non-const nullable reference (optional<StateT&>)
     { s.erase(key) } -> std::same_as<void>;
-    { s.put(key, std::declval<const StateT&>()) } -> std::same_as<StateT&>;
-    { s.put(key, std::declval<StateT&&>()) } -> std::same_as<StateT&>;
+    requires meta::check_for_each_in_variant<StateT, meta::curry<detail::CanBePutIntoStorage, T>::template type>;
 };
 
 } // namespace concepts
@@ -64,11 +77,11 @@ class StateProxy {
         return key;
     }
 
-    [[nodiscard]] decltype(auto) get() const {
-        return std::as_const(storage).get(key);
+    [[nodiscard]] StateT* get() const {
+        return storage.get()[key];
     }
 
-    [[nodiscard]] decltype(auto) operator()() const {
+    [[nodiscard]] StateT* operator()() const {
         return get();
     }
 
@@ -76,12 +89,10 @@ class StateProxy {
         storage.get().erase(key);
     }
 
-    decltype(auto) put(const StateT& state) const {
-        return storage.get().put(key, state);
-    }
-
-    decltype(auto) put(StateT&& state) const {
-        return storage.get().put(key, std::move(state));
+    template <typename T>
+        requires meta::is_part_of_variant<std::remove_cvref_t<T>, StateT>
+    StateT& put(T&& state) const {
+        return storage.get().put(key, std::forward<T>(state));
     }
 };
 
