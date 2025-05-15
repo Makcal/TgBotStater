@@ -16,9 +16,23 @@ Valid handler signatures:
  * from `void(const EventArgs&...)`
  * up to `void(StateOption&, const EventArgs&..., const TgBot::Api&, const StateStorageProxy&, const Dependencies&)`
 
-Everything except for `EventArgs` is optional. 
+Everything except for `EventArgs` is optional.
 Handlers that are not bound to a specific state can't take state parameter.
 For the lists of `EventArgs` see `CallbackArgs` member at [event.hpp](include/tg_stater/handler/event.hpp)
 
-**Note:** it's safe to reference `message.chat->...` objects in message handlers as the chat's id is used for chat/user recognition. 
-Other handler types have similar things, but you'd better check the source code of [event.hpp](include/tg_stater/handler/event.hpp) for that information.
+> [!NOTE]
+> It's safe to reference `message.chat->...` objects in message handlers as the chat's id is used for chat/user recognition.
+> Other handler types have similar things, but you'd better check the source code of [event.hpp](include/tg_stater/handler/event.hpp) for that information.
+
+## Reference to a state
+
+> [!IMPORTANT]
+> When you put a new state object into a storage, the old one most probably dies and its reference is invalidated.
+> Be very careful with this! See an example:
+```cpp
+[](StateA& state, const Message& m, const StateProxy& stateManager) {
+    std::println("{}", state.foo); // OK
+    stateManager.put(StateB{});
+    std::println("{}", state.foo); // UB, the reference is dangling
+}
+```
