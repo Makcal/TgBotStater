@@ -34,7 +34,7 @@ namespace detail {
 template <concepts::State StateT, concepts::StateStorage<StateT> StateStorageT, typename Dependencies, typename Handler>
 struct HandlerValidator {
   private:
-    using FT = decltype(Handler::f);
+    using FT = std::decay_t<decltype(Handler::f)>;
     using FirstArgT = std::remove_cvref_t<typename meta::function_traits<FT>::template ArgT<0>>;
     static constexpr bool takesState = concepts::StateOption<FirstArgT, StateT>;
 

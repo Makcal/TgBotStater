@@ -120,7 +120,7 @@ struct function_traits<ReturnT (*)(Args...)> : detail::general_function_traits<R
 
 // for function types
 template <typename ReturnT, typename... Args>
-struct function_traits<ReturnT(Args...)> : function_traits<ReturnT (*)(Args...)> {};
+struct function_traits<ReturnT(Args...)> : detail::general_function_traits<ReturnT, Args...> {};
 
 // Inspired by Haskell. See https://github.com/cpp-ru/ideas/issues/610 for description
 template <typename...>
