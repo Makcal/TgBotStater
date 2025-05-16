@@ -52,7 +52,7 @@ concept StateStorage = State<StateT> && requires(T& s, const StateKey& key) {
     typename T::StateT;
     requires std::same_as<typename T::StateT, StateT>;
 
-    { std::as_const(s)[key] } -> std::same_as<StateT*>; // pointer here represents a non-const nullable reference (optional<StateT&>)
+    { s[key] } -> std::same_as<StateT*>; // pointer here represents a non-const nullable reference (optional<StateT&>)
     { s.erase(key) } -> std::same_as<void>;
     requires meta::check_for_each_in_variant<StateT, meta::curry<detail::CanBePutIntoStorage, T>::template type>;
 };
