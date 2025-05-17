@@ -1,8 +1,6 @@
 #ifndef INCLUDE_tgbotstater_detail_logging
 #define INCLUDE_tgbotstater_detail_logging
 
-#include <fmt/base.h>
-
 #include <iostream>
 #include <utility>
 #include <version>
@@ -11,6 +9,7 @@
 #define USE_STD_FORMAT
 #include <format>
 #else
+#include <fmt/base.h>
 #include <fmt/format.h>
 #endif // __cpp_lib_format >= 201907L
 
