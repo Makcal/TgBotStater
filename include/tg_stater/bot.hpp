@@ -122,8 +122,14 @@ class StaterBase {
 
     // Helper function to invoke handlers
     template <typename... Callbacks_, typename... Args>
-    static constexpr void invokeCallbacks(meta::Proxy<Callbacks_...> /*unused*/, Args&&... args) {
-        (Callbacks_::func(std::forward<Args>(args)...), ...);
+    static constexpr void invokeCallbacks(meta::Proxy<Callbacks_...> /*unused*/, Args&&... args) noexcept {
+        try {
+            (Callbacks_::func(std::forward<Args>(args)...), ...);
+        } catch (const std::exception& e) {
+            logging::log("Caught exception in handler: {}\n", e.what());
+        } catch (...) {
+            logging::log("Non-exception exception caught\n");
+        }
     }
 
     template <typename... EventCallbacks, typename... EventArgs>
