@@ -21,7 +21,8 @@ Handlers that are not bound to a specific state can't take state parameter.
 For the lists of `EventArgs` see `CallbackArgs` member at [event.hpp](include/tg_stater/handler/event.hpp)
 
 > [!NOTE]
-> It's safe to reference `message.chat->...` objects in message handlers as the chat's id is used for chat/user recognition.
+> To get `chatId` or an event's similar target id, you'd better use `StateProxy.getKey()`.
+> But it's also possible to reference `message.chat->...` objects in message handlers as the chat's id is used for chat/user recognition.
 > Other handler types have similar things, but you'd better check the source code of [event.hpp](include/tg_stater/handler/event.hpp) for that information.
 
 ## Reference to a state
