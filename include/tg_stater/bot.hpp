@@ -173,8 +173,8 @@ class StaterBase {
     auto makeMessageHandler(std::string_view event, TgBot::Bot& bot) {
         return [&, event](const TgBot::Message::Ptr& mp) {
             const StateKey key = EventCategories::Message::getStateKey(mp);
-            handleEventProxy(meta::TupleToProxy<Callbacks_>{}, bot, key, *mp);
             logEvent(event, key);
+            handleEventProxy(meta::TupleToProxy<Callbacks_>{}, bot, key, *mp);
         };
     }
 
