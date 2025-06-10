@@ -2,7 +2,11 @@
 A C++ library for constructing Telegram bots in compile-time!
 
 # Installation
-The recommended way of connecting the library is via Conan package manager. To be updated.
+The recommended way of connecting the library is via Conan package manager. 
+For now it should be possible to install it via
+```bash
+conan create . --build=missing
+```
 
 # Usage
 ## Basic example of syntax
