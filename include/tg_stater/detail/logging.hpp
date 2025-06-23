@@ -18,12 +18,16 @@ namespace tg_stater::detail::logging {
 #ifdef USE_STD_FORMAT
 template <typename... Args>
 void log(std::format_string<Args...> format, Args&&... args) {
+#ifndef TGBOTSTATER_LOGGING_OFF
     std::clog << std::format(format, std::forward<Args>(args)...);
+#endif // TGBOTSTATER_LOGGING_OFF
 }
 #else
 template <typename... Args>
 void log(fmt::format_string<Args...> format, Args&&... args) {
+#ifndef TGBOTSTATER_LOGGING_OFF
     std::clog << fmt::format(format, std::forward<Args>(args)...);
+#endif // TGBOTSTATER_LOGGING_OFF
 }
 #endif // USE_STD_FORMAT
 
