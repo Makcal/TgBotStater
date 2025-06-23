@@ -133,14 +133,14 @@ class StaterBase {
         const char* handlerName = typeid(meta::ValueProxy<Callback::underlying>).name();
 #endif
         if constexpr (std::is_void_v<StateOption>)
-            logging::log("Running handler {} . Currently no state.\n", handlerName);
+            logging::log("Running handler {} . No state.\n", handlerName);
         else {
 #ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
             const std::string stateName = boost::core::demangle(typeid(StateOption).name());
 #else
             const char* stateName = typeid(StateOption).name();
 #endif
-            logging::log("Running handler {} . Currently state is {} .\n", handlerName, stateName);
+            logging::log("Running handler {} . Current state is {}\n", handlerName, stateName);
         }
         Callback::func(std::forward<Args>(args)...);
     }
