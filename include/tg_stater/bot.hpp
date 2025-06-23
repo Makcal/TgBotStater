@@ -189,9 +189,9 @@ class StaterBase {
         handleEvent<EventCallbacks...>(std::forward<Args>(args)...);
     }
 
-    static void logEvent(std::string_view event_type, const StateKey key) {
+    static void logEvent(std::string_view event_type, const StateKey& key) {
         detail::logging::log(
-            "{}: Trying to handle {} from chat {}\n", std::chrono::system_clock::now(), event_type, key);
+            "{}: Trying to handle {} from {}\n", std::chrono::system_clock::now(), event_type, key);
     }
 
     template <typename Callbacks_>
@@ -231,48 +231,48 @@ class StaterBase {
             makeMessageHandler<FindEventCallbacks<Events::EditedMessage>>("message edit", bot));
         bot.getEvents().onInlineQuery([&](const TgBot::InlineQuery::Ptr& iqp) {
             const StateKey key = EventCategories::InlineQuery::getStateKey(iqp);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::InlineQuery>>{}, bot, key, *iqp);
             logEvent("inline query", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::InlineQuery>>{}, bot, key, *iqp);
         });
         bot.getEvents().onChosenInlineResult([&](const TgBot::ChosenInlineResult::Ptr& cirp) {
             const StateKey key = EventCategories::ChosenInlineResult::getStateKey(cirp);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ChosenInlineResult>>{}, bot, key, *cirp);
             logEvent("chosen inline result", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ChosenInlineResult>>{}, bot, key, *cirp);
         });
         bot.getEvents().onCallbackQuery([&](const TgBot::CallbackQuery::Ptr& cqp) {
             const StateKey key = EventCategories::CallbackQuery::getStateKey(cqp);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::CallbackQuery>>{}, bot, key, *cqp);
             logEvent("callback query", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::CallbackQuery>>{}, bot, key, *cqp);
         });
         bot.getEvents().onShippingQuery([&](const TgBot::ShippingQuery::Ptr& sqp) {
             const StateKey key = EventCategories::ShippingQuery::getStateKey(sqp);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ShippingQuery>>{}, bot, key, *sqp);
             logEvent("shipping query", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ShippingQuery>>{}, bot, key, *sqp);
         });
         bot.getEvents().onPreCheckoutQuery([&](const TgBot::PreCheckoutQuery::Ptr& pcqp) {
             const StateKey key = EventCategories::PreCheckoutQuery::getStateKey(pcqp);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::PreCheckoutQuery>>{}, bot, key, *pcqp);
             logEvent("precheckout query", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::PreCheckoutQuery>>{}, bot, key, *pcqp);
         });
         bot.getEvents().onPollAnswer([&](const TgBot::PollAnswer::Ptr& pap) {
             const StateKey key = EventCategories::PollAnswer::getStateKey(pap);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::PollAnswer>>{}, bot, key, *pap);
             logEvent("poll answer", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::PollAnswer>>{}, bot, key, *pap);
         });
         bot.getEvents().onMyChatMember([&](const TgBot::ChatMemberUpdated::Ptr& cmup) {
             const StateKey key = EventCategories::ChatMemberUpdated::getStateKey(cmup);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::MyChatMember>>{}, bot, key, *cmup);
             logEvent("chat member update for bot", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::MyChatMember>>{}, bot, key, *cmup);
         });
         bot.getEvents().onChatMember([&](const TgBot::ChatMemberUpdated::Ptr& cmup) {
             const StateKey key = EventCategories::ChatMemberUpdated::getStateKey(cmup);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ChatMember>>{}, bot, key, *cmup);
             logEvent("chat member update", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ChatMember>>{}, bot, key, *cmup);
         });
         bot.getEvents().onChatJoinRequest([&](const TgBot::ChatJoinRequest::Ptr& cjrp) {
             const StateKey key = EventCategories::ChatJoinRequest::getStateKey(cjrp);
-            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ChatJoinRequest>>{}, bot, key, *cjrp);
             logEvent("chat join request", key);
+            handleEventProxy(meta::TupleToProxy<FindEventCallbacks<Events::ChatJoinRequest>>{}, bot, key, *cjrp);
         });
     }
 
