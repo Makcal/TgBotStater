@@ -50,7 +50,7 @@ struct CallbackHelper<StateT, StateOptionT, HandlerType, StateStorageProxyT, std
  *  * from `void(const EventArgs&...)`
  *  * up to `void(StateOption&, const EventArgs&..., const TgBot::Api&, const StateStorageProxy&, const Dependencies&)`
  *
- * Everything except for `EventArgs` is optional. 
+ * Everything except for `EventArgs` is optional.
  * Handlers that are not bound to a specific state can't take state parameter.
  * For the lists of `EventArgs` see `CallbackArgs` member at [event.hpp](include/tg_stater/handler/event.hpp)
  */
@@ -86,25 +86,27 @@ class Callback {
         // Inspired by the approach of "userver".
         // https://github.com/userver-framework/userver/blob/develop/libraries/easy/include/userver/easy.hpp
         // NOLINTBEGIN(*-magic-numbers)
-        constexpr unsigned matches =
-            (Helper::template invocableWithExtra<FT, false, ApiRef, SProxyRef, DepRef> << 0) |
-            (Helper::template invocableWithExtra<FT, false, SProxyRef, DepRef> << 1) |
-            (Helper::template invocableWithExtra<FT, false, ApiRef, DepRef> << 2) |
-            (Helper::template invocableWithExtra<FT, false, DepRef> << 3) |
-            (Helper::template invocableWithExtra<FT, false, ApiRef, SProxyRef> << 4) |
-            (Helper::template invocableWithExtra<FT, false, SProxyRef> << 5) |
-            (Helper::template invocableWithExtra<FT, false, ApiRef> << 6) |
-            (Helper::template invocableWithExtra<FT, false> << 7) |
-            (-static_cast<unsigned>(takesState) &
-             ((Helper::template invocableWithExtra<FT, true, ApiRef, SProxyRef, DepRef> << 8) |
-              (Helper::template invocableWithExtra<FT, true, SProxyRef, DepRef> << 9) |
-              (Helper::template invocableWithExtra<FT, true, ApiRef, DepRef> << 10) |
-              (Helper::template invocableWithExtra<FT, true, DepRef> << 11) |
-              (Helper::template invocableWithExtra<FT, true, ApiRef, SProxyRef> << 12) |
-              (Helper::template invocableWithExtra<FT, true, SProxyRef> << 13) |
-              (Helper::template invocableWithExtra<FT, true, ApiRef> << 14) |
-              (Helper::template invocableWithExtra<FT, true> << 15)));
-        static_assert(matches != 0, "Invalid signature. See class comment for available signatures.");
+        constexpr unsigned matches = (Helper::template invocableWithExtra<FT, false, ApiRef, SProxyRef, DepRef> << 0) |
+                                     (Helper::template invocableWithExtra<FT, false, SProxyRef, DepRef> << 1) |
+                                     (Helper::template invocableWithExtra<FT, false, ApiRef, DepRef> << 2) |
+                                     (Helper::template invocableWithExtra<FT, false, DepRef> << 3) |
+                                     (Helper::template invocableWithExtra<FT, false, ApiRef, SProxyRef> << 4) |
+                                     (Helper::template invocableWithExtra<FT, false, SProxyRef> << 5) |
+                                     (Helper::template invocableWithExtra<FT, false, ApiRef> << 6) |
+                                     (Helper::template invocableWithExtra<FT, false> << 7) |
+                                     (-static_cast<unsigned>(takesState) &
+                                      ((Helper::template invocableWithExtra<FT, true, ApiRef, SProxyRef, DepRef> << 8) |
+                                       (Helper::template invocableWithExtra<FT, true, SProxyRef, DepRef> << 9) |
+                                       (Helper::template invocableWithExtra<FT, true, ApiRef, DepRef> << 10) |
+                                       (Helper::template invocableWithExtra<FT, true, DepRef> << 11) |
+                                       (Helper::template invocableWithExtra<FT, true, ApiRef, SProxyRef> << 12) |
+                                       (Helper::template invocableWithExtra<FT, true, SProxyRef> << 13) |
+                                       (Helper::template invocableWithExtra<FT, true, ApiRef> << 14) |
+                                       (Helper::template invocableWithExtra<FT, true> << 15)));
+        static_assert(matches != 0,
+                      "Invalid signature for F template parameter of Callback. "
+                      "Find it in \"callback.hpp: In instantiation of... [with auto F = <HERE>...]\" error). "
+                      "See Callback class's doc comment for available signatures.");
         static_assert((matches & (matches - 1)) == 0,
                       "Several valid signatures are applicable. This is not supported.");
 
