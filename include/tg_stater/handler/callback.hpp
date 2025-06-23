@@ -175,6 +175,7 @@ class Callback {
   public:
     Callback() = delete;
 
+    static constexpr auto underlying = F;
     static constexpr auto func = transform();
     static constexpr auto event = Event;
     static constexpr auto type = HandlerType;

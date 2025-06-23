@@ -126,6 +126,9 @@ struct function_traits<ReturnT(Args...)> : detail::general_function_traits<Retur
 template <typename...>
 struct Proxy {};
 
+template <auto...>
+struct ValueProxy {};
+
 // Inspired by Haskell DataKind operator (')
 template <auto V>
 using quote = std::integral_constant<decltype(V), V>;

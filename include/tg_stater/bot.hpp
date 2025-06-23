@@ -10,7 +10,11 @@
 #include "tg_stater/state.hpp"
 #include "tg_stater/state_storage/common.hpp"
 #include "tg_stater/state_storage/memory.hpp"
+#include <string>
 
+#if !defined(TGBOTSTATER_LOGGING_OFF) && !defined(TGBOTSTATER_NOT_DEMANGLE_TYPES)
+#include <boost/core/demangle.hpp>
+#endif
 #include <tgbot/Api.h>
 #include <tgbot/Bot.h>
 #include <tgbot/net/TgLongPoll.h>
@@ -121,10 +125,31 @@ class StaterBase {
     DependenciesT dependencies;
 
     // Helper function to invoke handlers
-    template <typename... Callbacks_, typename... Args>
+    template <typename StateOption, typename Callback, typename... Args>
+    static constexpr void invokeCallback(Args&&... args) noexcept {
+#ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
+        const std::string handlerName = boost::core::demangle(typeid(meta::ValueProxy<Callback::underlying>).name());
+#else
+        const char* handlerName = typeid(meta::ValueProxy<Callback::underlying>).name();
+#endif
+        if constexpr (std::is_void_v<StateOption>)
+            logging::log("Running handler {} . Currently no state.\n", handlerName);
+        else {
+#ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
+            const std::string stateName = boost::core::demangle(typeid(StateOption).name());
+#else
+            const char* stateName = typeid(StateOption).name();
+#endif
+            logging::log("Running handler {} . Currently state is {} .\n", handlerName, stateName);
+        }
+        Callback::func(std::forward<Args>(args)...);
+    }
+
+    // Helper function to invoke handlers
+    template <typename StateOption, typename... Callbacks_, typename... Args>
     static constexpr void invokeCallbacks(meta::Proxy<Callbacks_...> /*unused*/, Args&&... args) noexcept {
         try {
-            (Callbacks_::func(std::forward<Args>(args)...), ...);
+            (invokeCallback<StateOption, Callbacks_>(std::forward<Args>(args)...), ...);
         } catch (const std::exception& e) {
             logging::log("Caught exception in handler: {}\n", e.what());
         } catch (...) {
@@ -142,21 +167,21 @@ class StaterBase {
             StateT& currentStateRef = *mCurrentState;
             std::visit(
                 [&](auto& state) {
-                    using StateOptionT = std::remove_reference_t<decltype(state)>;
-                    constexpr auto stateFilter = CallbackFinder::filterByStateOption<StateOptionT>;
+                    using StateOption = std::remove_reference_t<decltype(state)>;
+                    constexpr auto stateFilter = CallbackFinder::filterByStateOption<StateOption>;
                     using StateCallbacks = CallbackFinder::find<stateFilter, EventCallbacks...>;
-                    invokeCallbacks(
+                    invokeCallbacks<StateOption>(
                         meta::TupleToProxy<StateCallbacks>{}, state, eventArgs..., api, stateProxy, dependencies);
                 },
                 currentStateRef);
         } else {
             // no state handlers
             using NoStateCallbacks = CallbackFinder::find<CallbackFinder::noStateFilter, EventCallbacks...>;
-            invokeCallbacks(meta::TupleToProxy<NoStateCallbacks>{}, eventArgs..., api, stateProxy, dependencies);
+            invokeCallbacks<void>(meta::TupleToProxy<NoStateCallbacks>{}, eventArgs..., api, stateProxy, dependencies);
         }
         // any state handlers
         using AnyStateCallbacks = CallbackFinder::find<CallbackFinder::anyStateFilter, EventCallbacks...>;
-        invokeCallbacks(meta::TupleToProxy<AnyStateCallbacks>{}, eventArgs..., api, stateProxy, dependencies);
+        invokeCallbacks<void>(meta::TupleToProxy<AnyStateCallbacks>{}, eventArgs..., api, stateProxy, dependencies);
     }
 
     template <typename... EventCallbacks, typename... Args>
@@ -266,6 +291,9 @@ class StaterBase {
         setup(bot);
 
         detail::logging::log("Bot has started.\n");
+#if !defined(TGBOTSTATER_LOGGING_OFF) && defined(TGBOTSTATER_NOT_DEMANGLE_TYPES)
+        detail::logging::log("Debug type names can be demangled with `c++filt -t`\n");
+#endif
         TgBot::TgLongPoll longPoll{bot, limit, timeout, allowedUpdates};
         while (true) {
             try {
