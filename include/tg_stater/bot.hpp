@@ -126,7 +126,7 @@ class StaterBase {
 
     // Helper function to invoke handlers
     template <typename StateOption, typename Callback, typename... Args>
-    static constexpr void invokeCallback(Args&&... args) noexcept {
+    static constexpr void invokeCallback(Args&&... args) {
 #ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
         const std::string handlerName = boost::core::demangle(typeid(meta::ValueProxy<Callback::underlying>).name());
 #else
@@ -153,7 +153,7 @@ class StaterBase {
         } catch (const std::exception& e) {
             logging::log("Caught exception in handler: {}\n", e.what());
         } catch (...) {
-            logging::log("Non-exception exception caught\n");
+            logging::log("Non-std::exception exception was caught\n");
         }
     }
 
