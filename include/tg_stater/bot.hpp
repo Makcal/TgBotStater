@@ -10,7 +10,6 @@
 #include "tg_stater/state.hpp"
 #include "tg_stater/state_storage/common.hpp"
 #include "tg_stater/state_storage/memory.hpp"
-#include <string>
 
 #if !defined(TGBOTSTATER_LOGGING_OFF) && !defined(TGBOTSTATER_NOT_DEMANGLE_TYPES)
 #include <boost/core/demangle.hpp>
@@ -22,9 +21,11 @@
 
 #include <chrono>
 #include <concepts>
+#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <memory>
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <type_traits>
@@ -128,19 +129,23 @@ class StaterBase {
     template <typename StateOption, typename Callback, typename... Args>
     static constexpr void invokeCallback(Args&&... args) {
 #ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
-        const std::string handlerName = boost::core::demangle(typeid(meta::ValueProxy<Callback::underlying>).name());
+        using namespace std::literals;
+        // TODO: check with Clang
+        static constexpr std::size_t demangledSkip = "tg_stater::meta::ValueProxy<&"sv.size();
+        std::string handlerName = boost::core::demangle(typeid(meta::ValueProxy<Callback::underlying>).name());
+        handlerName = handlerName.substr(demangledSkip, handlerName.size() - demangledSkip - 1);
 #else
         const char* handlerName = typeid(meta::ValueProxy<Callback::underlying>).name();
 #endif
         if constexpr (std::is_void_v<StateOption>)
-            logging::log("Running handler {} . No state.\n", handlerName);
+            logging::log("No state. Running handler {}\n", handlerName);
         else {
 #ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
             const std::string stateName = boost::core::demangle(typeid(StateOption).name());
 #else
             const char* stateName = typeid(StateOption).name();
 #endif
-            logging::log("Running handler {} . Current state is {}\n", handlerName, stateName);
+            logging::log("Current state is {}. Running handler {}\n", stateName, handlerName);
         }
         Callback::func(std::forward<Args>(args)...);
     }
@@ -190,8 +195,7 @@ class StaterBase {
     }
 
     static void logEvent(std::string_view event_type, const StateKey& key) {
-        detail::logging::log(
-            "{}: Trying to handle {} from {}\n", std::chrono::system_clock::now(), event_type, key);
+        detail::logging::log("{}: Trying to handle {} from {}\n", std::chrono::system_clock::now(), event_type, key);
     }
 
     template <typename Callbacks_>
