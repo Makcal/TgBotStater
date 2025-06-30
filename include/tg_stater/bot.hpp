@@ -294,7 +294,7 @@ class StaterBase {
                const std::shared_ptr<UpdatesList>& allowedUpdates = std::make_shared<UpdatesList>()) {
         setup(bot);
 
-        detail::logging::log("Bot has started.\n");
+        detail::logging::log("Bot has started at https://t.me/{}\n", bot.getApi().getMe()->username);
 #if !defined(TGBOTSTATER_LOGGING_OFF) && defined(TGBOTSTATER_NOT_DEMANGLE_TYPES)
         detail::logging::log("Debug type names can be demangled with `c++filt -t`\n");
 #endif
