@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.7.0)
 
 project(TgBotStater CXX)
-set(PROJECT_VERSION "0.3.6")
+set(PROJECT_VERSION "0.3.7")
 message(STATUS "${CMAKE_PROJECT_NAME} version: ${PROJECT_VERSION}")
 
 find_package(tgbot REQUIRED)
