@@ -128,20 +128,34 @@ class StaterBase {
     // Helper function to invoke handlers
     template <typename StateOption, typename Callback, typename... Args>
     static constexpr void invokeCallback(Args&&... args) {
-#ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
+#if !defined(TGBOTSTATER_NOT_DEMANGLE_TYPES) and !defined(TGBOTSTATER_LOGGING_OFF)
+        const std::string handlerNameWrapped =
+            boost::core::demangle(typeid(meta::ValueProxy<Callback::underlying>).name());
+
         using namespace std::literals;
-        // TODO: check with Clang
-        static constexpr std::size_t demangledSkip = "tg_stater::meta::ValueProxy<&"sv.size();
-        std::string handlerName = boost::core::demangle(typeid(meta::ValueProxy<Callback::underlying>).name());
-        handlerName = handlerName.substr(demangledSkip, handlerName.size() - demangledSkip - 1);
+        static constexpr std::size_t demangledSkip = "tg_stater::meta::ValueProxy<"sv.size();
+        std::string_view handlerName = handlerNameWrapped;
+        handlerName = handlerName.substr(demangledSkip, handlerName.size() - demangledSkip - 1); // last is '>'
+        if (handlerName.starts_with('&'))
+            handlerName = handlerName.substr(1);
+#ifndef TGBOTSTATER_FULL_DEMANGLE
+        std::size_t qualifiedNameLength = handlerName.find('{'); // for lambdas
+        handlerName = handlerName.substr(handlerName.substr(0, qualifiedNameLength).rfind("::") + 2);
+#endif
 #else
         const char* handlerName = typeid(meta::ValueProxy<Callback::underlying>).name();
 #endif
         if constexpr (std::is_void_v<StateOption>)
             logging::log("No state. Running handler {}\n", handlerName);
         else {
-#ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
+#if !defined(TGBOTSTATER_NOT_DEMANGLE_TYPES) and !defined(TGBOTSTATER_LOGGING_OFF)
+#ifndef TGBOTSTATER_FULL_DEMANGLE
+            const std::string stateNameFull = boost::core::demangle(typeid(StateOption).name());
+            std::string_view stateName = stateNameFull;
+            stateName = stateName.substr(stateName.rfind("::") + 2);
+#else
             const std::string stateName = boost::core::demangle(typeid(StateOption).name());
+#endif
 #else
             const char* stateName = typeid(StateOption).name();
 #endif
