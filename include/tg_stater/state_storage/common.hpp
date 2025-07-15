@@ -89,10 +89,12 @@ class StateProxy {
         storage.get().erase(key);
     }
 
-    template <typename T>
-        requires meta::is_part_of_variant<std::remove_cvref_t<T>, StateT>
-    StateT& put(T&& state) const {
-        return storage.get().put(key, std::forward<T>(state));
+    template <typename StateOption>
+        requires meta::is_part_of_variant<std::remove_cvref_t<StateOption>, StateT>
+    StateT& put(StateOption&& state) const {
+        if constexpr (logging::atLeast<logging::INFO>)
+            logging::log("State of {} was switched to {}", key, logging::getStateName<StateOption>());
+        return storage.get().put(key, std::forward<StateOption>(state));
     }
 };
 

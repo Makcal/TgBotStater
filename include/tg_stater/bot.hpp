@@ -180,7 +180,7 @@ class StaterBase {
     }
 
     static void logEvent(std::string_view event_type, const StateKey& key) {
-        logging::log("Trying to handle {} from {}", event_type, key);
+        logging::log("Handling {} from {}", event_type, key);
     }
 
     template <typename Callbacks_>

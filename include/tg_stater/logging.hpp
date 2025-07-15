@@ -43,7 +43,11 @@ using LoggingLevel::INFO;
 using LoggingLevel::WARN;
 
 template <LoggingLevel level>
-    requires(level == DEBUG) || (level == INFO) || (level == WARN) || (level == ERROR) || (level == FATAL)
+concept ValidLoggingLevel =
+    (level == DEBUG) || (level == INFO) || (level == WARN) || (level == ERROR) || (level == FATAL);
+
+template <LoggingLevel level>
+    requires ValidLoggingLevel<level>
 constexpr const char* loggingLevelName = "";
 template <>
 inline constexpr const char* loggingLevelName<DEBUG> = "DEBUG";
@@ -78,7 +82,7 @@ template <LoggingLevel level>
 static constexpr bool atLeast = loggingLevel <= level;
 
 template <LoggingLevel level = LoggingLevel::INFO, typename... Args>
-    requires(level != LoggingLevel::OFF)
+    requires ValidLoggingLevel<level>
 void log(TGBOTSTATER_FMT_NAMESPACE::format_string<Args...> format, Args&&... args) {
     if constexpr (atLeast<level>) {
         using std::chrono::system_clock;
