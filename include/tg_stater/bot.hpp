@@ -120,6 +120,8 @@ class StaterBase {
     StateStorageT stateStorage;
     DependenciesT dependencies;
 
+    struct AnyStateInvokeTag {};
+
     // Helper function to invoke handlers
     template <typename StateOption, typename Callback, typename... Args>
     static constexpr void invokeCallback(Args&&... args) {
@@ -127,6 +129,8 @@ class StaterBase {
             auto handlerName = logging::getHandlerName<Callback>();
             if constexpr (std::is_void_v<StateOption>)
                 logging::log("No state. Running handler {}", handlerName);
+            else if constexpr (std::is_same_v<StateOption, AnyStateInvokeTag>)
+                logging::log("Running handler {}", handlerName);
             else {
                 auto stateName = logging::getStateName<StateOption>();
                 logging::log("Current state is {}. Running handler {}", stateName, handlerName);
@@ -171,7 +175,8 @@ class StaterBase {
         }
         // any state handlers
         using AnyStateCallbacks = CallbackFinder::find<CallbackFinder::anyStateFilter, EventCallbacks...>;
-        invokeCallbacks<void>(meta::TupleToProxy<AnyStateCallbacks>{}, eventArgs..., api, stateProxy, dependencies);
+        invokeCallbacks<AnyStateInvokeTag>(
+            meta::TupleToProxy<AnyStateCallbacks>{}, eventArgs..., api, stateProxy, dependencies);
     }
 
     template <typename... EventCallbacks, typename... Args>
