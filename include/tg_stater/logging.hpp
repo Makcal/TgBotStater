@@ -3,33 +3,90 @@
 
 #include "tg_stater/meta.hpp"
 
-#if !(defined(TGBOTSTATER_LOGGING_OFF) || defined(TGBOTSTATER_NOT_DEMANGLE_TYPES))
+#ifndef TGBOTSTATER_NOT_DEMANGLE_TYPES
 #include <boost/core/demangle.hpp>
 #endif
 
+#include <chrono>
 #include <cstddef>
+#include <ctime>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #if __cpp_lib_format >= 201907L
-#define USE_STD_FORMAT
-#define FMT_NAMESPACE std
+#define TGBOTSTATER_USE_STD_FORMAT
+#define TGBOTSTATER_FMT_NAMESPACE std
 #include <format>
 #else
-#define FMT_NAMESPACE fmt
+#define TGBOTSTATER_FMT_NAMESPACE fmt
 #include <fmt/base.h>
 #include <fmt/format.h>
 #endif // __cpp_lib_format >= 201907L
 
-namespace tg_stater::detail::logging {
+namespace tg_stater::logging {
 
-template <typename... Args>
-void log(FMT_NAMESPACE::format_string<Args...> format, Args&&... args) {
-#ifndef TGBOTSTATER_LOGGING_OFF
-    std::clog << FMT_NAMESPACE::format(format, std::forward<Args>(args)...);
-#endif // TGBOTSTATER_LOGGING_OFF
+enum struct LoggingLevel : char {
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR,
+    FATAL,
+    OFF,
+};
+using LoggingLevel::DEBUG;
+using LoggingLevel::ERROR;
+using LoggingLevel::FATAL;
+using LoggingLevel::INFO;
+using LoggingLevel::WARN;
+
+template <LoggingLevel level>
+    requires(level == DEBUG) || (level == INFO) || (level == WARN) || (level == ERROR) || (level == FATAL)
+constexpr const char* loggingLevelName = "";
+template <>
+inline constexpr const char* loggingLevelName<DEBUG> = "DEBUG";
+template <>
+inline constexpr const char* loggingLevelName<INFO> = "INFO";
+template <>
+inline constexpr const char* loggingLevelName<WARN> = "WARN";
+template <>
+inline constexpr const char* loggingLevelName<ERROR> = "ERROR";
+template <>
+inline constexpr const char* loggingLevelName<FATAL> = "FATAL";
+
+constexpr LoggingLevel loggingLevel =
+#if defined(TGBOTSTATER_LOG_OFF)
+    OFF
+#elif defined(TGBOTSTATER_LOG_DEBUG)
+    DEBUG
+#elif defined(TGBOTSTATER_LOG_INFO)
+    INFO
+#elif defined(TGBOTSTATER_LOG_WARN)
+    WARN
+#elif defined(TGBOTSTATER_LOG_ERROR)
+    ERROR
+#elif defined(TGBOTSTATER_LOG_FATAL)
+    FATAL
+#else
+    LoggingLevel::INFO
+#endif
+    ;
+
+template <LoggingLevel level>
+static constexpr bool atLeast = loggingLevel <= level;
+
+template <LoggingLevel level = LoggingLevel::INFO, typename... Args>
+    requires(level != LoggingLevel::OFF)
+void log(TGBOTSTATER_FMT_NAMESPACE::format_string<Args...> format, Args&&... args) {
+    if constexpr (atLeast<level>) {
+        using std::chrono::system_clock;
+        std::time_t time = system_clock::to_time_t(system_clock::now());
+        std::string message = TGBOTSTATER_FMT_NAMESPACE::format(format, std::forward<Args>(args)...);
+        std::clog << '[' << loggingLevelName<level> << "] [" << std::put_time(std::localtime(&time), "%FT%T%z") << "] "
+                  << message << '\n';
+    }
 }
 
 template <typename Callback>
@@ -101,6 +158,6 @@ auto getStateName() {
 #endif
 }
 
-} // namespace tg_stater::detail::logging
+} // namespace tg_stater::logging
 
 #endif // INCLUDE_tgbotstater_detail_logging

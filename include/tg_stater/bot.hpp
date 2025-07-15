@@ -2,10 +2,10 @@
 #define INCLUDE_tgbotstater_bot
 
 #include "tg_stater/dependencies.hpp"
-#include "tg_stater/detail/logging.hpp"
 #include "tg_stater/handler/callback.hpp"
 #include "tg_stater/handler/event.hpp"
 #include "tg_stater/handler/type.hpp"
+#include "tg_stater/logging.hpp"
 #include "tg_stater/meta.hpp"
 #include "tg_stater/state.hpp"
 #include "tg_stater/state_storage/common.hpp"
@@ -16,9 +16,7 @@
 #include <tgbot/net/TgLongPoll.h>
 #include <tgbot/types/Message.h>
 
-#include <chrono>
 #include <concepts>
-#include <cstddef>
 #include <cstdint>
 #include <exception>
 #include <memory>
@@ -125,15 +123,15 @@ class StaterBase {
     // Helper function to invoke handlers
     template <typename StateOption, typename Callback, typename... Args>
     static constexpr void invokeCallback(Args&&... args) {
-#ifndef TGBOTSTATER_LOGGING_OFF
-        auto handlerName = logging::getHandlerName<Callback>();
-        if constexpr (std::is_void_v<StateOption>)
-            logging::log("No state. Running handler {}\n", handlerName);
-        else {
-            auto stateName = logging::getStateName<StateOption>();
-            logging::log("Current state is {}. Running handler {}\n", stateName, handlerName);
+        if constexpr (logging::atLeast<logging::INFO>) {
+            auto handlerName = logging::getHandlerName<Callback>();
+            if constexpr (std::is_void_v<StateOption>)
+                logging::log("No state. Running handler {}", handlerName);
+            else {
+                auto stateName = logging::getStateName<StateOption>();
+                logging::log("Current state is {}. Running handler {}", stateName, handlerName);
+            }
         }
-#endif
         Callback::func(std::forward<Args>(args)...);
     }
 
@@ -143,9 +141,9 @@ class StaterBase {
         try {
             (invokeCallback<StateOption, Callbacks_>(std::forward<Args>(args)...), ...);
         } catch (const std::exception& e) {
-            logging::log("Caught exception in handler: {}\n", e.what());
+            logging::log<logging::ERROR>("Caught exception in handler: {}", e.what());
         } catch (...) {
-            logging::log("Non-std::exception exception was caught\n");
+            logging::log<logging::ERROR>("Non-std::exception exception was caught");
         }
     }
 
@@ -182,7 +180,7 @@ class StaterBase {
     }
 
     static void logEvent(std::string_view event_type, const StateKey& key) {
-        detail::logging::log("{}: Trying to handle {} from {}\n", std::chrono::system_clock::now(), event_type, key);
+        logging::log("Trying to handle {} from {}", event_type, key);
     }
 
     template <typename Callbacks_>
@@ -281,16 +279,18 @@ class StaterBase {
                const std::shared_ptr<UpdatesList>& allowedUpdates = std::make_shared<UpdatesList>()) {
         setup(bot);
 
-        detail::logging::log("Bot has started at https://t.me/{}\n", bot.getApi().getMe()->username);
-#if !defined(TGBOTSTATER_LOGGING_OFF) && defined(TGBOTSTATER_NOT_DEMANGLE_TYPES)
-        detail::logging::log("Debug type names can be demangled with `c++filt -t`\n");
+        if constexpr (logging::atLeast<logging::INFO>) {
+            logging::log("Bot has started at https://t.me/{}", bot.getApi().getMe()->username);
+#ifdef TGBOTSTATER_NOT_DEMANGLE_TYPES
+            logging::log("Debug type names can be demangled with `c++filt -t`");
 #endif
+        }
         TgBot::TgLongPoll longPoll{bot, limit, timeout, allowedUpdates};
         while (true) {
             try {
                 longPoll.start();
             } catch (const std::exception& e) {
-                detail::logging::log("{}\n", e.what());
+                logging::log<logging::ERROR>("{}", e.what());
             }
         }
     }

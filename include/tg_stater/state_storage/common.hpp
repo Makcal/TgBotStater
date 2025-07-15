@@ -1,16 +1,16 @@
 #ifndef INCLUDE_tgbotstater_state_storage_common
 #define INCLUDE_tgbotstater_state_storage_common
 
-#include "tg_stater/detail/logging.hpp"
+#include "tg_stater/logging.hpp"
 #include "tg_stater/meta.hpp"
 #include "tg_stater/state.hpp"
 #include "tg_stater/tg_types.hpp"
 
-#ifdef USE_STD_FORMAT
+#ifdef TGBOTSTATER_USE_STD_FORMAT
 #include <format>
 #else
 #include <fmt/format.h>
-#endif // USE_STD_FORMAT
+#endif // TGBOTSTATER_USE_STD_FORMAT
 
 #include <concepts>
 #include <cstddef>
@@ -41,7 +41,7 @@ template <typename StateStorageT, typename T>
 struct CanBePutIntoStorage {
     static constexpr bool value = requires(StateStorageT& s, const StateKey& key) {
         { s.put(key, std::declval<const T&>()) } -> std::same_as<typename StateStorageT::StateT&>;
-        { s.put(key, std::declval<T&&>()) } -> std::same_as<typename StateStorageT::StateT&>;
+        { s.put(key, std::declval<T &&>()) } -> std::same_as<typename StateStorageT::StateT&>;
     };
 };
 
@@ -107,7 +107,7 @@ struct std::hash<tg_stater::StateKey> {
     }
 };
 
-#ifdef USE_STD_FORMAT
+#ifdef TGBOTSTATER_USE_STD_FORMAT
 template <>
 struct std::formatter<tg_stater::StateKey> {
     template <class ParseContext>
