@@ -14,6 +14,7 @@
 #include <tgbot/Api.h>
 #include <tgbot/Bot.h>
 #include <tgbot/net/TgLongPoll.h>
+#include <tgbot/net/TgWebhookTcpServer.h>
 #include <tgbot/types/Message.h>
 
 #include <concepts>
@@ -270,6 +271,15 @@ class StaterBase {
         });
     }
 
+    static void logPreStartMessage(const TgBot::Bot& bot) {
+        if constexpr (logging::atLeast<logging::INFO>) {
+            logging::log("Bot has started at https://t.me/{}", bot.getApi().getMe()->username);
+#ifdef TGBOTSTATER_NOT_DEMANGLE_TYPES
+            logging::log("Debug type names can be demangled with `c++filt -t`");
+#endif
+        }
+    }
+
   public:
     explicit constexpr StaterBase(StateStorageT stateStorage = StateStorageT{},
                                   DependenciesT dependencies = DependenciesT{})
@@ -283,17 +293,33 @@ class StaterBase {
                std::int32_t timeout = 10, // NOLINT(*-magic-numbers)
                const std::shared_ptr<UpdatesList>& allowedUpdates = std::make_shared<UpdatesList>()) {
         setup(bot);
+        logPreStartMessage(bot);
 
-        if constexpr (logging::atLeast<logging::INFO>) {
-            logging::log("Bot has started at https://t.me/{}", bot.getApi().getMe()->username);
-#ifdef TGBOTSTATER_NOT_DEMANGLE_TYPES
-            logging::log("Debug type names can be demangled with `c++filt -t`");
-#endif
-        }
+        bot.getApi().deleteWebhook();
         TgBot::TgLongPoll longPoll{bot, limit, timeout, allowedUpdates};
         while (true) {
             try {
                 longPoll.start();
+            } catch (const std::exception& e) {
+                logging::log<logging::ERROR>("{}", e.what());
+            }
+        }
+    }
+
+    void startWebhook(TgBot::Bot&& bot, // NOLINT(*-rvalue-reference-param-not-moved)
+                      unsigned short port,
+                      const std::string& url,
+                      const std::string& path,
+                      const std::shared_ptr<UpdatesList>& allowedUpdates = std::make_shared<UpdatesList>(),
+                      std::uint16_t maxConnections = 40) { // NOLINT(*magic-numbers*)
+        setup(bot);
+        logPreStartMessage(bot);
+
+        bot.getApi().setWebhook(url, nullptr, maxConnections, allowedUpdates);
+        TgBot::TgWebhookTcpServer server{port, path, bot.getEventHandler()};
+        while (true) {
+            try {
+                server.start();
             } catch (const std::exception& e) {
                 logging::log<logging::ERROR>("{}", e.what());
             }
