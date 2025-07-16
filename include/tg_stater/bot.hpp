@@ -15,6 +15,7 @@
 #include <tgbot/Bot.h>
 #include <tgbot/net/TgLongPoll.h>
 #include <tgbot/net/TgWebhookTcpServer.h>
+#include <tgbot/types/InputFile.h>
 #include <tgbot/types/Message.h>
 
 #include <concepts>
@@ -310,12 +311,17 @@ class StaterBase {
                       unsigned short port,
                       const std::string& url,
                       const std::string& path,
+                      TgBot::InputFile::Ptr certificate = nullptr,
                       const std::shared_ptr<UpdatesList>& allowedUpdates = std::make_shared<UpdatesList>(),
-                      std::uint16_t maxConnections = 40) { // NOLINT(*magic-numbers*)
+                      std::uint16_t maxConnections = 40, // NOLINT(*magic-numbers*)
+                      const std::string& ipAddress = "",
+                      bool dropPendingUpdates = false,
+                      const std::string& secretToken = "") {
         setup(bot);
         logPreStartMessage(bot);
 
-        bot.getApi().setWebhook(url, nullptr, maxConnections, allowedUpdates);
+        bot.getApi().setWebhook(
+            url, std::move(certificate), maxConnections, allowedUpdates, ipAddress, dropPendingUpdates, secretToken);
         TgBot::TgWebhookTcpServer server{port, path, bot.getEventHandler()};
         while (true) {
             try {
