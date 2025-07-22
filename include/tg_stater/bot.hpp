@@ -127,7 +127,7 @@ class StaterBase {
     // Helper function to invoke handlers
     template <typename StateOption, typename Callback, typename... Args>
     static constexpr void invokeCallback(Args&&... args) {
-#ifndef TGBOTSTATER_NOT_LOG_HANGLER_CALLS
+#ifndef TGBOTSTATER_NOT_LOG_HANDLERS_CALLS
         if constexpr (logging::atLeast<logging::INFO>) {
             auto handlerName = logging::getHandlerName<Callback>();
             if constexpr (std::is_void_v<StateOption>)
